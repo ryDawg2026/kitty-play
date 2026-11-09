@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#ffe8f0">
+<title>Kitty Play — Cat Care Game for Kids</title>
+<style>
+:root{
+  --pink:#ff8fb8;--pink2:#ff6b9d;--cream:#fff7fb;--sky:#a8e6ff;
+  --sun:#ffe066;--mint:#7ddeca;--ink:#3a2a3a;--soft:#6b5a6b;
+  --card:#ffffff;--ok:#5ad08a;--warn:#ffb347;--sleepy:#9b8cff;
+  --r:22px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;font-family:"Segoe UI",system-ui,-apple-system,sans-serif;background:linear-gradient(180deg,#ffe8f0 0%,#e8f7ff 55%,#fff6d6 100%);color:var(--ink);touch-action:manipulation;user-select:none}
+body{display:flex;flex-direction:column;align-items:center}
+#app{width:100%;max-width:520px;height:100%;display:flex;flex-direction:column;padding:10px 12px 14px;position:relative}
+header{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+h1{margin:0;font-size:1.35rem;letter-spacing:.2px}
+.badge{background:#fff;border-radius:999px;padding:6px 12px;font-weight:700;box-shadow:0 2px 10px rgba(0,0,0,.08);font-size:.95rem}
+button,.btn{appearance:none;border:0;cursor:pointer;font:inherit;font-weight:800;border-radius:18px;padding:12px 16px;background:var(--pink2);color:#fff;box-shadow:0 4px 0 #d94f7f;transition:transform .08s,box-shadow .08s}
+button:active,.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #d94f7f}
+button.secondary{background:#7ec8ff;box-shadow:0 4px 0 #4aa8e8}
+button.mint{background:#5ad0a8;box-shadow:0 4px 0 #3aa57f}
+button.sun{background:#ffd34e;color:#5a3a00;box-shadow:0 4px 0 #e0b020}
+button.ghost{background:#fff;color:var(--ink);box-shadow:0 3px 0 #e6d6e0}
+button:disabled{opacity:.5;cursor:default}
+#meters{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:4px 0 8px}
+.meter{background:#fff;border-radius:16px;padding:8px 10px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.meter label{display:block;font-size:.72rem;font-weight:800;letter-spacing:.3px;margin-bottom:4px}
+.bar{height:12px;background:#f0e6ee;border-radius:999px;overflow:hidden}
+.bar>i{display:block;height:100%;width:50%;border-radius:999px;transition:width .35s ease}
+.bar.hunger>i{background:linear-gradient(90deg,#ffb347,#ff8a3d)}
+.bar.happy>i{background:linear-gradient(90deg,#ff8fb8,#ff5f9e)}
+.bar.energy>i{background:linear-gradient(90deg,#9b8cff,#6f8cff)}
+#stage{flex:1;min-height:0;background:rgba(255,255,255,.55);border-radius:28px;box-shadow:inset 0 0 0 3px rgba(255,143,184,.25),0 8px 24px rgba(0,0,0,.06);position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center}
+#room{position:absolute;inset:0;background:
+  radial-gradient(circle at 20% 20%,rgba(255,255,200,.5),transparent 40%),
+  radial-gradient(circle at 80% 10%,rgba(168,230,255,.45),transparent 35%),
+  linear-gradient(180deg,#fff0f6 0%,#eef9ff 60%,#ffe9c7 100%)}
+#floor{position:absolute;left:0;right:0;bottom:0;height:28%;background:linear-gradient(180deg,#f7d9b8,#efc49a);border-top:4px solid #e0b07a}
+#window{position:absolute;top:18px;right:18px;width:78px;height:78px;border-radius:16px;background:linear-gradient(180deg,#9ad7ff,#ffe9a8);border:6px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+#window::after{content:"☀️";position:absolute;top:8px;right:8px;font-size:22px}
+#rug{position:absolute;left:50%;bottom:8%;transform:translateX(-50%);width:62%;height:18%;background:radial-gradient(ellipse,#ffd6e8,#ffb4d0);border-radius:50%;opacity:.9}
+#catWrap{position:absolute;left:50%;bottom:22%;transform:translateX(-50%);width:180px;height:170px;z-index:5;cursor:pointer}
+#cat{width:100%;height:100%;transition:transform .2s}
+#cat.purr{animation:purr .35s ease-in-out 3}
+#cat.happy{animation:bounce .45s ease 2}
+#cat.sleepy{filter:saturate(.85) brightness(.95)}
+#cat.chase{transition:left .18s linear,top .18s linear}
+@keyframes purr{0%,100%{transform:rotate(0)}25%{transform:rotate(-4deg)}75%{transform:rotate(4deg)}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.heart,.star{position:absolute;pointer-events:none;font-size:22px;animation:rise 1s ease-out forwards;z-index:20}
+@keyframes rise{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-70px) scale(1.4)}}
+#speech{position:absolute;left:50%;top:12%;transform:translateX(-50%);background:#fff;border-radius:18px;padding:10px 16px;font-weight:800;box-shadow:0 4px 14px rgba(0,0,0,.1);z-index:8;max-width:86%;text-align:center;opacity:0;transition:opacity .2s}
+#speech.show{opacity:1}
+#speech::after{content:"";position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);border:8px solid transparent;border-top-color:#fff}
+#nav{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-top:10px}
+#nav button{font-size:.85rem;padding:14px 8px;line-height:1.15}
+#overlay{position:absolute;inset:0;background:rgba(58,42,58,.35);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;z-index:30;padding:16px}
+#overlay.show{display:flex}
+.panel{background:#fff;border-radius:24px;padding:18px;width:100%;max-width:380px;box-shadow:0 16px 40px rgba(0,0,0,.18);max-height:92%;overflow:auto}
+.panel h2{margin:0 0 8px;font-size:1.25rem;text-align:center}
+.panel p{margin:0 0 12px;color:var(--soft);text-align:center;line-height:1.35}
+.row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.food,.tool{width:72px;height:72px;border-radius:20px;background:#fff6fb;border:3px solid #ffd0e4;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:28px;font-weight:800;cursor:grab;touch-action:none;box-shadow:0 3px 0 #f0c0d4}
+.food span,.tool span{font-size:.65rem;margin-top:2px}
+.food:active,.tool:active{cursor:grabbing}
+#bowl{position:absolute;left:18%;bottom:14%;width:70px;height:36px;background:#fff;border:4px solid #ffb4d0;border-radius:0 0 40px 40px;z-index:4;display:flex;align-items:flex-end;justify-content:center;overflow:hidden}
+#bowlFill{width:100%;height:0%;background:linear-gradient(180deg,#ffd89a,#ffb347);transition:height .3s}
+#yarn{position:absolute;width:48px;height:48px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff,#ff6b9d 45%,#d94f7f);box-shadow:0 4px 0 #c43d6c,inset -6px -6px 0 rgba(0,0,0,.08);z-index:12;display:none;touch-action:none;cursor:grab}
+#yarn::after{content:"";position:absolute;inset:10px;border:2px dashed rgba(255,255,255,.7);border-radius:50%}
+.mouse{position:absolute;width:46px;height:46px;font-size:34px;z-index:15;cursor:pointer;animation:floaty 1.2s ease-in-out infinite;filter:drop-shadow(0 3px 2px rgba(0,0,0,.15));transition:transform .1s}
+.mouse.booped{animation:none;transform:scale(1.4);opacity:0;transition:all .25s}
+#hud{position:absolute;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;align-items:center;z-index:10;pointer-events:none}
+#hud .chip{pointer-events:auto;background:#fff;border-radius:999px;padding:6px 12px;font-weight:800;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+#confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:40}
+.conf{position:absolute;width:10px;height:14px;border-radius:2px;animation:fall 1.4s ease-in forwards}
+@keyframes fall{0%{transform:translateY(-20px) rotate(0);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
+#nameBar{display:flex;gap:6px;align-items:center}
+#nameBar input{flex:1;border:3px solid #ffd0e4;border-radius:14px;padding:10px 12px;font:inherit;font-weight:700;font-size:1rem;outline:none;min-width:0}
+#muteBtn{min-width:48px;padding:10px}
+.tiny{font-size:.75rem;color:var(--soft);text-align:center;margin-top:6px}
+#startGate{position:absolute;inset:0;background:linear-gradient(180deg,#ffe8f0,#e8f7ff);z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center}
+#startGate h1{font-size:2rem;margin:0 0 6px}
+#startGate .bigcat{font-size:88px;line-height:1;margin:8px 0 12px;animation:bounce 1.2s ease-in-out infinite}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="startGate">
+    <div class="bigcat">🐱</div>
+    <h1>Kitty Play</h1>
+    <p style="color:var(--soft);margin:0 0 14px;font-weight:700">Feed · Play · Boop toy mice · Pet your cat</p>
+    <div class="panel" style="box-shadow:none;padding:0;background:transparent;width:100%">
+      <div id="nameBar">
+        <input id="catNameInput" maxlength="12" placeholder="Name your cat" aria-label="Cat name">
+        <button id="muteBtn" class="ghost" type="button" title="Sound">🔊</button>
+      </div>
+      <button id="startBtn" class="mint" style="width:100%;margin-top:12px;font-size:1.1rem;padding:16px">Let's Play!</button>
+      <p class="tiny">No ads · No sign-in · Saved on this device</p>
+    </div>
+  </div>
+
+  <header>
+    <h1>🐱 <span id="titleName">Kitty</span></h1>
+    <div style="display:flex;gap:6px;align-items:center">
+      <div class="badge" id="starBadge">⭐ 0</div>
+      <button id="muteBtn2" class="ghost" type="button" style="padding:8px 10px;min-width:0">🔊</button>
+    </div>
+  </header>
+
+  <div id="meters">
+    <div class="meter"><label>🍽️ Hungry</label><div class="bar hunger"><i id="hungerBar" style="width:55%"></i></div></div>
+    <div class="meter"><label>💗 Happy</label><div class="bar happy"><i id="happyBar" style="width:60%"></i></div></div>
+    <div class="meter"><label>😴 Energy</label><div class="bar energy"><i id="energyBar" style="width:70%"></i></div></div>
+  </div>
+
+  <div id="stage">
+    <div id="room"></div>
+    <div id="window"></div>
+    <div id="floor"></div>
+    <div id="rug"></div>
+    <div id="bowl"><div id="bowlFill"></div></div>
+    <div id="speech">Meow!</div>
+    <div id="hud"><div class="chip" id="modeChip">Home</div><div class="chip" id="timerChip" style="display:none">⏱ 30</div></div>
+    <div id="catWrap" title="Pet me!">
+      <svg id="cat" viewBox="0 0 200 190" aria-label="Cute cat">
+        <ellipse cx="100" cy="155" rx="48" ry="18" fill="#f0c8a8" opacity=".45"/>
+        <ellipse cx="100" cy="130" rx="55" ry="42" fill="#ffb347"/>
+        <ellipse cx="100" cy="128" rx="38" ry="30" fill="#ffd089"/>
+        <path d="M55 78 L48 28 L82 62 Z" fill="#ffb347"/>
+        <path d="M145 78 L152 28 L118 62 Z" fill="#ffb347"/>
+        <path d="M60 74 L55 40 L78 64 Z" fill="#ffd089"/>
+        <path d="M140 74 L145 40 L122 64 Z" fill="#ffd089"/>
+        <circle cx="100" cy="88" r="42" fill="#ffb347"/>
+        <circle cx="100" cy="92" r="32" fill="#ffd089"/>
+        <ellipse cx="84" cy="88" rx="8" ry="10" fill="#3a2a3a"/>
+        <ellipse cx="116" cy="88" rx="8" ry="10" fill="#3a2a3a"/>
+        <circle cx="86" cy="86" r="2.5" fill="#fff"/>
+        <circle cx="118" cy="86" r="2.5" fill="#fff"/>
+        <ellipse cx="100" cy="102" rx="7" ry="5" fill="#ff8fb8"/>
+        <path d="M100 107 Q92 114 86 110" stroke="#c45a7a" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path d="M100 107 Q108 114 114 110" stroke="#c45a7a" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path d="M55 98 H20" stroke="#e8a070" stroke-width="2" stroke-linecap="round"/>
+        <path d="M55 104 H18" stroke="#e8a070" stroke-width="2" stroke-linecap="round"/>
+        <path d="M55 110 H22" stroke="#e8a070" stroke-width="2" stroke-linecap="round"/>
+        <path d="M145 98 H180" stroke="#e8a070" stroke-width="2" stroke-linecap="round"/>
+        <path d="M145 104 H182" stroke="#e8a070" stroke-width="2" stroke-linecap="round"/>
+        <path d="M145 110 H178" stroke="#e8a070" stroke-width="2" stroke-linecap="round"/>
+        <path id="tail" d="M155 140 Q190 110 175 80" stroke="#ffb347" stroke-width="14" fill="none" stroke-linecap="round"/>
+        <circle cx="78" cy="100" r="7" fill="#ff8fb8" opacity=".45"/>
+        <circle cx="122" cy="100" r="7" fill="#ff8fb8" opacity=".45"/>
+        <g id="smileHappy" style="display:none">
+          <path d="M88 112 Q100 122 112 112" stroke="#c45a7a" stroke-width="3" fill="none" stroke-linecap="round"/>
+        </g>
+        <g id="eyesSleepy" style="display:none">
+          <path d="M76 88 Q84 84 92 88" stroke="#3a2a3a" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <path d="M108 88 Q116 84 124 88" stroke="#3a2a3a" stroke-width="3" fill="none" stroke-linecap="round"/>
+        </g>
+      </svg>
+    </div>
+    <div id="yarn" aria-label="Yarn ball"></div>
+    <div id="confetti"></div>
+
+    <div id="overlay">
+      <div class="panel" id="panelFeed">
+        <h2>🍽️ Feed Kitty</h2>
+        <p>Tap a snack, then tap the bowl!</p>
+        <div class="row" id="foodRow">
+          <div class="food" data-food="fish" data-fill="28">🐟<span>Fish</span></div>
+          <div class="food" data-food="milk" data-fill="22">🥛<span>Milk</span></div>
+          <div class="food" data-food="kibble" data-fill="18">🥣<span>Kibble</span></div>
+        </div>
+        <button class="ghost" data-close style="width:100%;margin-top:12px">Done</button>
+      </div>
+      <div class="panel hidden" id="panelYarn">
+        <h2>🧶 Yarn Time</h2>
+        <p>Drag the yarn ball. Kitty will chase it!</p>
+        <button class="sun" id="startYarn" style="width:100%">Start Playing</button>
+        <button class="ghost" data-close style="width:100%;margin-top:8px">Back</button>
+      </div>
+      <div class="panel hidden" id="panelMice">
+        <h2>🐭 Boop the Toys</h2>
+        <p>Tap the toy mice before they hide. Gentle boops turn them into stars!</p>
+        <button class="mint" id="startMice" style="width:100%">Play 30 Seconds</button>
+        <button class="ghost" data-close style="width:100%;margin-top:8px">Back</button>
+      </div>
+      <div class="panel hidden" id="panelDone">
+        <h2 id="doneTitle">Great job!</h2>
+        <p id="doneMsg">You did it!</p>
+        <button class="mint" data-close style="width:100%">Yay!</button>
+      </div>
+    </div>
+  </div>
+
+  <nav id="nav">
+    <button id="btnFeed" type="button">🍽️<br>Feed</button>
+    <button id="btnYarn" class="sun" type="button">🧶<br>Yarn</button>
+    <button id="btnMice" class="secondary" type="button">🐭<br>Mice</button>
+    <button id="btnPet" class="mint" type="button">🫶<br>Pet</button>
+  </nav>
+</div>
+
+<script>
+(function(){
+  const SKEY='kittyPlay.v1';
+  const state={
+    name:'Kitty', stars:0, hunger:55, happy:60, energy:70,
+    muted:false, mode:'home', selectedFood:null, yarnOn:false,
+    miceOn:false, miceScore:0, miceLeft:30, miceTimer:null, miceSpawn:null
+  };
+
+  const $ = (q,el=document)=>el.querySelector(q);
+  const $$ = (q,el=document)=>[...el.querySelectorAll(q)];
+
+  function load(){
+    try{
+      const d=JSON.parse(localStorage.getItem(SKEY)||'{}');
+      if(d.name) state.name=String(d.name).slice(0,12);
+      if(typeof d.stars==='number') state.stars=Math.max(0,d.stars|0);
+      if(typeof d.hunger==='number') state.hunger=clamp(d.hunger);
+      if(typeof d.happy==='number') state.happy=clamp(d.happy);
+      if(typeof d.energy==='number') state.energy=clamp(d.energy);
+      if(typeof d.muted==='boolean') state.muted=d.muted;
+    }catch(e){}
+  }
+  function save(){
+    localStorage.setItem(SKEY, JSON.stringify({
+      name:state.name, stars:state.stars, hunger:state.hunger,
+      happy:state.happy, energy:state.energy, muted:state.muted
+    }));
+  }
+  function clamp(n){ return Math.max(0, Math.min(100, n)); }
+
+  // --- WebAudio (quiet) ---
+  let AC=null;
+  function ac(){
+    if(!AC) AC=new (window.AudioContext||window.webkitAudioContext)();
+    if(AC.state==='suspended') AC.resume();
+    return AC;
+  }
+  function tone(freq, dur, type='sine', vol=0.04){
+    if(state.muted) return;
+    try{
+      const a=ac(); const o=a.createOscillator(); const g=a.createGain();
+      o.type=type; o.frequency.value=freq;
+      g.gain.value=vol; g.gain.exponentialRampToValueAtTime(0.001, a.currentTime+dur);
+      o.connect(g); g.connect(a.destination);
+      o.start(); o.stop(a.currentTime+dur);
+    }catch(e){}
+  }
+  function sfx(kind){
+    if(kind==='meow'){ tone(520,.08,'triangle',.035); setTimeout(()=>tone(420,.12,'triangle',.03),70); }
+    else if(kind==='purr'){ tone(120,.25,'sine',.025); setTimeout(()=>tone(140,.25,'sine',.02),80); }
+    else if(kind==='eat'){ tone(300,.06,'square',.03); setTimeout(()=>tone(260,.08,'square',.025),60); }
+    else if(kind==='boop'){ tone(880,.05,'sine',.04); setTimeout(()=>tone(1200,.08,'sine',.03),40); }
+    else if(kind==='star'){ tone(660,.06,'sine',.035); setTimeout(()=>tone(990,.1,'sine',.03),50); }
+    else if(kind==='yarn'){ tone(240,.04,'triangle',.02); }
+    else if(kind==='yay'){ tone(523,.08); setTimeout(()=>tone(659,.08),80); setTimeout(()=>tone(784,.16),160); }
+  }
+
+  function speak(msg, ms=1600){
+    const el=$('#speech'); el.textContent=msg; el.classList.add('show');
+    clearTimeout(speak._t); speak._t=setTimeout(()=>el.classList.remove('show'), ms);
+  }
+
+  function confetti(n=40){
+    const box=$('#confetti');
+    const colors=['#ff6b9d','#ffe066','#7ddeca','#7ec8ff','#ff8fb8','#5ad08a'];
+    for(let i=0;i<n;i++){
+      const c=document.createElement('i'); c.className='conf';
+      c.style.left=(Math.random()*100)+'%';
+      c.style.background=colors[i%colors.length].replace(' ','');
+      c.style.animationDelay=(Math.random()*0.4)+'s';
+      c.style.transform=`rotate(${Math.random()*360}deg)`;
+      box.appendChild(c);
+      setTimeout(()=>c.remove(),1800);
+    }
+  }
+
+  function floatEmoji(x,y,emoji,cls='heart'){
+    const e=document.createElement('div'); e.className=cls; e.textContent=emoji;
+    e.style.left=x+'px'; e.style.top=y+'px';
+    $('#stage').appendChild(e);
+    setTimeout(()=>e.remove(),1000);
+  }
+
+  function updateUI(){
+    $('#titleName').textContent=state.name;
+    $('#starBadge').textContent='⭐ '+state.stars;
+    $('#hungerBar').style.width=state.hunger+'%';
+    $('#happyBar').style.width=state.happy+'%';
+    $('#energyBar').style.width=state.energy+'%';
+    const muteLabel=state.muted?'🔇':'🔊';
+    $('#muteBtn').textContent=muteLabel;
+    $('#muteBtn2').textContent=muteLabel;
+    const cat=$('#cat');
+    cat.classList.toggle('sleepy', state.energy<25);
+    const sleepy=$('#eyesSleepy'), smile=$('#smileHappy');
+    const eyes=$$('#cat ellipse[cx="84"], #cat ellipse[cx="116"]');
+    if(state.energy<25){
+      sleepy.style.display=''; eyes.forEach(e=>e.style.display='none'); smile.style.display='none';
+    } else {
+      sleepy.style.display='none'; eyes.forEach(e=>e.style.display='');
+      smile.style.display=state.happy>70?'':'none';
+    }
+    $('#bowlFill').style.height=Math.min(90, state.hunger*0.7)+'%';
+  }
+
+  function addStars(n){
+    state.stars+=n; save(); updateUI(); sfx('star');
+  }
+
+  // --- Modes ---
+  function openOverlay(which){
+    $('#overlay').classList.add('show');
+    $$('#overlay .panel').forEach(p=>p.classList.add('hidden'));
+    $(which).classList.remove('hidden');
+  }
+  function closeOverlay(clearFood){
+    $('#overlay').classList.remove('show');
+    if(clearFood) state.selectedFood=null;
+  }
+
+  // Feed
+  function startFeed(){
+    stopYarn(); stopMice(false);
+    state.mode='feed'; $('#modeChip').textContent='Feed';
+    openOverlay('#panelFeed');
+  }
+  $$('.food').forEach(f=>{
+    f.addEventListener('click',()=>{
+      state.selectedFood=f.dataset.food;
+      $$('.food').forEach(x=>x.style.borderColor='#ffd0e4');
+      f.style.borderColor='#ff6b9d';
+      speak('Tap the bowl!'); sfx('meow');
+      closeOverlay();
+    });
+  });
+  $('#bowl').addEventListener('click',()=>{
+    if(state.mode!=='feed' || !state.selectedFood) return;
+    const food=document.querySelector(`.food[data-food="${state.selectedFood}"]`);
+    const fill=+(food?.dataset.fill||20);
+    state.hunger=clamp(state.hunger+fill);
+    state.happy=clamp(state.happy+6);
+    state.energy=clamp(state.energy+4);
+    state.selectedFood=null;
+    sfx('eat');
+    $('#cat').classList.remove('purr'); void $('#cat').offsetWidth; $('#cat').classList.add('purr');
+    speak(state.name+' yum! 😻');
+    const r=$('#bowl').getBoundingClientRect(), s=$('#stage').getBoundingClientRect();
+    floatEmoji(r.left-s.left+20, r.top-s.top-10, '❤️');
+    if(state.hunger>=90){ addStars(1); confetti(24); speak('Full tummy! ⭐'); }
+    save(); updateUI();
+  });
+
+  // Yarn
+  const yarn=$('#yarn');
+  let yarnDrag=false;
+  function startYarnMode(){
+    stopMice(false);
+    state.mode='yarn'; state.yarnOn=true;
+    $('#modeChip').textContent='Yarn';
+    closeOverlay();
+    yarn.style.display='block';
+    yarn.style.left='60%'; yarn.style.top='40%';
+    speak('Drag the yarn!'); sfx('yarn');
+  }
+  function stopYarn(){
+    state.yarnOn=false; yarn.style.display='none'; yarnDrag=false;
+    $('#catWrap').style.left='50%'; $('#catWrap').style.bottom='22%'; $('#catWrap').style.top='';
+  }
+  function yarnPos(clientX, clientY){
+    const s=$('#stage').getBoundingClientRect();
+    let x=clientX-s.left-24, y=clientY-s.top-24;
+    x=Math.max(8, Math.min(s.width-56, x));
+    y=Math.max(8, Math.min(s.height-56, y));
+    yarn.style.left=x+'px'; yarn.style.top=y+'px';
+    // cat chase
+    const cw=$('#catWrap');
+    cw.style.left=(x+10)+'px'; cw.style.top=(y+30)+'px'; cw.style.bottom='auto'; cw.style.transform='translate(0,0)';
+    state.happy=clamp(state.happy+0.15);
+    state.energy=clamp(state.energy-0.05);
+    if(Math.random()<0.08){ sfx('yarn'); floatEmoji(x,y,'✨','star'); }
+    updateUI();
+  }
+  function onYarnDown(e){
+    if(!state.yarnOn) return;
+    yarnDrag=true; e.preventDefault();
+    const t=e.touches?e.touches[0]:e;
+    yarnPos(t.clientX,t.clientY);
+  }
+  function onYarnMove(e){
+    if(!yarnDrag) return; e.preventDefault();
+    const t=e.touches?e.touches[0]:e;
+    yarnPos(t.clientX,t.clientY);
+  }
+  function onYarnUp(){
+    if(!yarnDrag) return; yarnDrag=false;
+    state.happy=clamp(state.happy+4); save(); updateUI();
+    $('#cat').classList.remove('happy'); void $('#cat').offsetWidth; $('#cat').classList.add('happy');
+    speak('Fun! 🧶'); sfx('purr');
+    if(state.happy>=85){ addStars(1); confetti(20); }
+  }
+  yarn.addEventListener('mousedown', onYarnDown);
+  yarn.addEventListener('touchstart', onYarnDown, {passive:false});
+  window.addEventListener('mousemove', onYarnMove);
+  window.addEventListener('touchmove', onYarnMove, {passive:false});
+  window.addEventListener('mouseup', onYarnUp);
+  window.addEventListener('touchend', onYarnUp);
+  $('#startYarn').addEventListener('click', startYarnMode);
+
+  // Mice mini-game
+  function startMice(){
+    stopYarn();
+    state.mode='mice'; state.miceOn=true; state.miceScore=0; state.miceLeft=30;
+    $('#modeChip').textContent='Boop!';
+    $('#timerChip').style.display='block';
+    $('#timerChip').textContent='⏱ 30';
+    closeOverlay();
+    speak('Boop the toy mice!'); sfx('meow');
+    clearInterval(state.miceTimer); clearInterval(state.miceSpawn);
+    state.miceTimer=setInterval(()=>{
+      state.miceLeft--;
+      $('#timerChip').textContent='⏱ '+state.miceLeft;
+      if(state.miceLeft<=0) stopMice(true);
+    },1000);
+    spawnMouse();
+    state.miceSpawn=setInterval(spawnMouse, 900);
+  }
+  function spawnMouse(){
+    if(!state.miceOn) return;
+    const s=$('#stage');
+    const m=document.createElement('div');
+    m.className='mouse'; m.textContent='🐭'; m.setAttribute('role','button');
+    m.setAttribute('aria-label','Toy mouse');
+    const w=s.clientWidth, h=s.clientHeight;
+    m.style.left=(20+Math.random()*(w-80))+'px';
+    m.style.top=(50+Math.random()*(h-140))+'px';
+    const boop=()=>{
+      if(m.classList.contains('booped')) return;
+      m.classList.add('booped');
+      state.miceScore++;
+      state.happy=clamp(state.happy+2);
+      sfx('boop');
+      const r=m.getBoundingClientRect(), sr=s.getBoundingClientRect();
+      floatEmoji(r.left-sr.left, r.top-sr.top, Math.random()<.5?'⭐':'💖', 'star');
+      setTimeout(()=>m.remove(),220);
+      updateUI();
+    };
+    m.addEventListener('click', boop);
+    m.addEventListener('touchstart', e=>{e.preventDefault();boop();},{passive:false});
+    s.appendChild(m);
+    setTimeout(()=>{ if(m.parentNode && !m.classList.contains('booped')) m.remove(); }, 2200);
+  }
+  function stopMice(showResult){
+    state.miceOn=false;
+    clearInterval(state.miceTimer); clearInterval(state.miceSpawn);
+    state.miceTimer=state.miceSpawn=null;
+    $$('.mouse').forEach(m=>m.remove());
+    $('#timerChip').style.display='none';
+    if(showResult){
+      const gained=Math.max(1, Math.floor(state.miceScore/3));
+      state.stars+=gained; state.happy=clamp(state.happy+8); save(); updateUI();
+      $('#doneTitle').textContent='Boop Party!';
+      $('#doneMsg').textContent=`You booped ${state.miceScore} toy mice and earned ${gained} ⭐`;
+      openOverlay('#panelDone');
+      confetti(36); sfx('yay');
+      speak('So gentle! ⭐');
+    }
+    if(state.mode==='mice'){ state.mode='home'; $('#modeChip').textContent='Home'; }
+  }
+  $('#startMice').addEventListener('click', startMice);
+
+  // Pet
+  function petCat(e){
+    if(state.miceOn) return;
+    const s=$('#stage').getBoundingClientRect();
+    let x,y;
+    if(e && (e.clientX||e.touches)){
+      const t=e.touches?e.touches[0]:e;
+      x=t.clientX-s.left; y=t.clientY-s.top;
+    } else {
+      const r=$('#catWrap').getBoundingClientRect();
+      x=r.left-s.left+60; y=r.top-s.top+40;
+    }
+    floatEmoji(x,y,'💖');
+    state.happy=clamp(state.happy+5);
+    state.energy=clamp(state.energy+2);
+    sfx('purr');
+    $('#cat').classList.remove('purr'); void $('#cat').offsetWidth; $('#cat').classList.add('purr');
+    speak('Purrrr 😻');
+    if(Math.random()<0.25){ addStars(1); confetti(16); }
+    save(); updateUI();
+  }
+  $('#catWrap').addEventListener('click', petCat);
+  $('#btnPet').addEventListener('click', ()=>{
+    stopYarn(); stopMice(false); state.mode='home'; $('#modeChip').textContent='Pet';
+    petCat();
+  });
+
+  // Nav
+  $('#btnFeed').addEventListener('click', startFeed);
+  $('#btnYarn').addEventListener('click', ()=>{ stopMice(false); openOverlay('#panelYarn'); });
+  $('#btnMice').addEventListener('click', ()=>{ stopYarn(); openOverlay('#panelMice'); });
+  $$('[data-close]').forEach(b=>b.addEventListener('click', ()=>{
+    closeOverlay(true);
+    if(!state.yarnOn && !state.miceOn){ state.mode='home'; $('#modeChip').textContent='Home'; }
+  }));
+
+  function toggleMute(){
+    state.muted=!state.muted; save(); updateUI();
+    if(!state.muted) sfx('meow');
+  }
+  $('#muteBtn').addEventListener('click', toggleMute);
+  $('#muteBtn2').addEventListener('click', toggleMute);
+
+  // Start
+  load();
+  $('#catNameInput').value=state.name==='Kitty'?'':state.name;
+  updateUI();
+  $('#startBtn').addEventListener('click', ()=>{
+    const n=$('#catNameInput').value.trim().slice(0,12);
+    if(n) state.name=n;
+    save(); updateUI();
+    $('#startGate').classList.add('hidden');
+    sfx('yay'); speak('Hi '+state.name+'! 🐱'); confetti(28);
+    try{ ac(); }catch(e){}
+  });
+
+  // gentle drain over time
+  setInterval(()=>{
+    if(state.miceOn||state.yarnOn) return;
+    state.hunger=clamp(state.hunger-0.4);
+    state.energy=clamp(state.energy-0.25);
+    state.happy=clamp(state.happy-0.2);
+    save(); updateUI();
+  }, 8000);
+
+  // expose for tests
+  window.__kitty={state, startFeed, startYarnMode, startMice, petCat, stopMice, stopYarn, updateUI, save};
+})();
+</script>
+</body>
+</html>
